@@ -1,18 +1,84 @@
 var express = require("express");
 var app = express();
+var sf = require("node-salesforce");
 
 app.configure(function() {
   app.use(express.logger());
   app.use(express.bodyParser());
+	app.use(express.cookieParser());
+	app.use(express.session({
+       secret: "some string here"
+	}));
 });
 
 app.get('/', function(request, response) {
-  response.send('Hello World!');
+  response.send(JSON.stringify('Dynosaur API is running'));
 });
 
-app.post('/create', function(request, response) {
-  var name = request.body.name;
-  console.log("Creating app named: %s", name);
+var oauth2 = new sf.OAuth2({
+	clientId:     '3MVG98XJQQAccJQe8EPY3A12EcX61t7u9dCnqkVjqQnkLwyxRb3aSI7T2yBhAFUtTpYC7IMkpiRYGeHcXNk3D',
+  clientSecret: '8019842437687888855',
+  redirectUri : 'https://login.salesforce.com/services/oauth2/callback'
+});
+
+app.get('/oauth2/auth', function(request, response) {
+  response.redirect(oauth2.getAuthorizationUrl({ 
+			scope : 'api id web' 
+		}));
+});
+
+app.post('/login', function(request, response) {
+	var username = request.body.username;
+	var password = request.body.password;
+
+	var conn = new sf.Connection({
+		oauth2 : {
+			clientId:     '3MVG98XJQQAccJQe8EPY3A12EcX61t7u9dCnqkVjqQnkLwyxRb3aSI7T2yBhAFUtTpYC7IMkpiRYGeHcXNk3D',
+			clientSecret: '8019842437687888855',
+			redirectUri : 'https://login.salesforce.com/services/oauth2/callback'
+		}
+	});
+
+	conn.login(username, password, function(err, userInfo) {
+  	if (err) { 
+			response.send(JSON.stringify({success:false}));
+			console.error(err);
+		}
+
+		request.session.access_token = conn.accessToken;
+		request.session.instance_url = conn.instanceUrl;
+
+		console.log(request.session.access_token);
+
+  	console.log("User ID: " + userInfo.id);
+  	console.log("Org ID: " + userInfo.organizationId);
+	
+		response.send(JSON.stringify({success:true}));
+	});
+
+});
+
+app.get('/logged_in', function(request, response) {
+	response.send(JSON.stringify(!!request.session.access_token));
+});
+
+app.get('/contacts', function(request, response) {
+	var conn = new sf.Connection({
+  	instanceUrl : request.session.instance_url,
+  	accessToken : request.session.access_token
+	});
+
+	conn.sobject("Contact")
+  .find({ CreatedDate: sf.Date.TODAY }, '*') // fields in asterisk, means wildcard.
+  .execute(function(err, records) {
+    response.send(JSON.stringify(records));
+  });
+});
+
+app.post('/filter', function(request, response) {
+  var type = request.body.type;
+
+  var peopleList = JSON.parse(request.body.peopleList);
 });
 
 var port = process.env.PORT || 5000;
