@@ -79,7 +79,7 @@ app.post('/login', function(request, response) {
   	console.log("User ID: " + userInfo.id);
   	console.log("Org ID: " + userInfo.organizationId);
 	
-		response.send(JSON.stringify({success:true, result:userInfo}));
+		response.send(JSON.stringify({success:true, session: sid, result:userInfo}));
 	});
 
 });
