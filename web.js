@@ -9,10 +9,14 @@ var app = express();
 app.configure(function() {
   app.use(express.logger());
   app.use(express.bodyParser());
-	app.use(express.cookieParser());
-	app.use(express.session({
-       secret: "some string here"
-	}));
+});
+app.use(function(req, res, next) {
+	var allowHeaders = ['Cache-Control', 'Pragma', 'Accept', 'Accept-Version', 'Authorization', 'Content-Type', 'Api-Version', 'Origin', 'Referer', 'User-Agent', 'X-Requested-With', 'X-File-Name'];
+	res.header('Access-Control-Allow-Credentials', true);
+	res.header('Access-Control-Allow-Origin', req.headers['origin'] || "*");
+	res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || allowHeaders.join(','));
+	res.header('Access-Control-Allow-Methods', req.headers['access-control-request-method'] || ["GET", "PUT", "DELETE", "POST", "OPTIONS"].join(','));
+	next();
 });
 
 app.get('/', function(request, response) {
@@ -25,6 +29,20 @@ var oauth2 = new sf.OAuth2({
   redirectUri : 'https://login.salesforce.com/services/oauth2/callback'
 });
 
+var sessions = {};
+var randstr = function (len, possible) {
+	var text = "";
+	len = len || 6;
+	possible = possible || "abcdefghijklmnopqrstuvwxyz0123456789";
+	if (len <= 0) return "";
+	if (!possible || !possible.length) return "";
+	if (typeof possible != "string") return "";
+	for (var i = 0; i < len; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
+};
+
 app.get('/oauth2/auth', function(request, response) {
   response.redirect(oauth2.getAuthorizationUrl({ 
 			scope : 'api id web' 
@@ -34,6 +52,10 @@ app.get('/oauth2/auth', function(request, response) {
 app.post('/login', function(request, response) {
 	var username = request.body.username;
 	var password = request.body.password;
+	do {
+		var sid = randstr(20);
+	} while (sessions[sid])
+	sessions[sid] = {};
 
 	var conn = new sf.Connection({
 		oauth2 : {
@@ -49,21 +71,22 @@ app.post('/login', function(request, response) {
 			console.error(err);
 		}
 
-		request.session.access_token = conn.accessToken;
-		request.session.instance_url = conn.instanceUrl;
+		sessions[sid].access_token = conn.accessToken;
+		sessions[sid].instance_url = conn.instanceUrl;
 
-		console.log(request.session.access_token);
-
-  	console.log("User ID: " + userInfo.id);
-  	console.log("Org ID: " + userInfo.organizationId);
+		console.log("Access Token: %s.", sessions[sid].access_token);
+	  	console.log("User ID: %s.", userInfo.id);
+  		console.log("Org ID: %s.", userInfo.organizationId);
 	
-		response.send(JSON.stringify({success:true, result:userInfo}));
+		response.send(JSON.stringify({success:true, session: sid, result:userInfo}));
 	});
 
 });
 
 app.get('/logged_in', function(request, response) {
-	response.send(JSON.stringify(!!request.session.access_token));
+	var sid = request.query.session;
+	var session = sessions[sid || ""] || {};
+	response.send(JSON.stringify({ success: true, result: !!session.access_token }));
 });
 
 app.get('/apps', function(request, response) {
@@ -94,10 +117,12 @@ app.get('/apps', function(request, response) {
 app.post('/create', function(request, response) {
 	var app_id  = request.body.app_id;
 	var options = request.body.options;
+	var sid = request.body.session;
+	var session = sessions[sid || ""] || {};
 
 	var conn = new sf.Connection({
-  	instanceUrl : request.session.instance_url,
-  	accessToken : request.session.access_token
+  	instanceUrl : session.instance_url,
+  	accessToken : session.access_token
 	});
 
 	if(app_id == "1234") {
