@@ -54,8 +54,8 @@ app.post('/login', function(request, response) {
 	var password = request.body.password;
 	do {
 		var sid = randstr(20);
-		var session = sessions[sid || ""];
 	} while (sessions[sid])
+	var session = {};
 
 	var conn = new sf.Connection({
 		oauth2 : {
@@ -86,7 +86,7 @@ app.post('/login', function(request, response) {
 
 app.get('/logged_in', function(request, response) {
 	var sid = request.body.session;
-	var session = sessions[sid || ""];
+	var session = sessions[sid || ""] || {};
 	response.send(JSON.stringify(!!session.access_token));
 });
 
@@ -119,7 +119,7 @@ app.post('/create', function(request, response) {
 	var app_id  = request.body.app_id;
 	var options = request.body.options;
 	var sid = request.body.session;
-	var session = sessions[sid || ""];
+	var session = sessions[sid || ""] || {};
 
 	var conn = new sf.Connection({
   	instanceUrl : session.instance_url,
