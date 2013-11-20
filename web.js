@@ -74,7 +74,7 @@ app.post('/login', function(request, response) {
 		sessions[sid].access_token = conn.accessToken;
 		sessions[sid].instance_url = conn.instanceUrl;
 
-		console.log("Access Token: %s.", session.access_token);
+		console.log("Access Token: %s.", sessions[sid].access_token);
 	  	console.log("User ID: %s.", userInfo.id);
   		console.log("Org ID: %s.", userInfo.organizationId);
 	
