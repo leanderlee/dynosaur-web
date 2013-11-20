@@ -4,7 +4,8 @@
   "dependencies": {
     "express": "3.1.x",
 		"node-salesforce" : "latest",
-		"connect" : "latest"
+		"connect" : "latest",
+		"heroku-client" : "latest"
   },
   "engines": {
     "node": "0.10.x",
