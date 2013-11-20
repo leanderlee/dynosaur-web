@@ -103,6 +103,9 @@ app.post('/create', function(request, response) {
 	if(app_id == "1234") {
 		create_contacts(request, response, conn);
 	}
+	else if (app_id == "1235") {
+		create_coupons(request, response, conn);
+	}
 	else {
 		response.send({success:false, message:"Unknown app: " + app_id});
 	}
@@ -139,6 +142,32 @@ var create_contacts = function(request, response, conn) {
 	 });
 }
 
+var create_coupons = function(request, response, conn) {
+	conn.query("SELECT id__c, headline__c, description__c, validdate__c FROM Coupon__c", function(err, result) {
+		console.log(result);
+
+		var header = '<html>\n'
+               + '<head>\n'
+							 + '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />\n'
+							 + '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>\n'
+							 + '<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>\n'
+							 + '</head>\n'
+							 + '<body>\n';
+
+		var body = '<ul data-role="listview">\n';
+		for(var i = 0; i < Object.keys(result.records).length; i++) {
+			body += '<li><img src="images/coupon.png" /><a href="#"><h1>' + result.records[i].headline__c + '</h1></a></li>\n';
+		}
+
+		var footer = '</ul>\n'
+						   + '</body>\n'
+							 + '</html>\n'
+
+		var page = header + body + footer;
+		create_app(page, request, response);
+
+	 });
+}
 var create_app = function(page, request, response) {
 	exec('uuidgen', function(error, stdout, stderr) {
 
