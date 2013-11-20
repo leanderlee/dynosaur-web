@@ -2,7 +2,7 @@
 DIR=$1
 
 cd $DIR
-cp ../contacts/* ./
+cp ../app_static/* ./
 git init > /dev/null
 git add index.html package.json web.js Procfile > /dev/null
 git commit -m "Added index.html" > /dev/null
