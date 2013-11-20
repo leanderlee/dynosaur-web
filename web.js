@@ -45,7 +45,7 @@ app.post('/login', function(request, response) {
 
 	conn.login(username, password, function(err, userInfo) {
   	if (err) { 
-			response.send(JSON.stringify({success:false}));
+			response.send(JSON.stringify({success:false, message:err}));
 			console.error(err);
 		}
 
@@ -57,7 +57,7 @@ app.post('/login', function(request, response) {
   	console.log("User ID: " + userInfo.id);
   	console.log("Org ID: " + userInfo.organizationId);
 	
-		response.send(JSON.stringify({success:true}));
+		response.send(JSON.stringify({success:true, result:userInfo}));
 	});
 
 });
@@ -66,18 +66,52 @@ app.get('/logged_in', function(request, response) {
 	response.send(JSON.stringify(!!request.session.access_token));
 });
 
-app.get('/contacts', function(request, response) {
+app.get('/apps', function(request, response) {
+	var apps = [
+		{
+			id: "1234",
+			name: "Awesome App 1",
+			description: "This is a description of app 1.",
+			thumbnail: "http://dynosapp.com/thumbnail1.png",
+			picture: "http://dynosapp.com/picture1.png",
+			options: [
+				{ property: "name", label: "Name", type: "text", "default": "unnamed app" },
+				{ property: "gender", label: "Sex", type: "select", options: [{ value: "m", label: "Male" }, { value: "f", label: "Female" }] },
+			]
+		},
+		{ id: "1235", name: "Awesome App 2", description: "This is a description of app 2.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1236", name: "Awesome App 3", description: "This is a description of app 3.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1237", name: "Awesome App 4", description: "This is a description of app 4.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1238", name: "Awesome App 5", description: "This is a description of app 5.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1239", name: "Awesome App 6", description: "This is a description of app 6.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1230", name: "Awesome App 7", description: "This is a description of app 7.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
+		{ id: "1231", name: "Awesome App 8", description: "This is a description of app 8.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] }
+	];
+
+	response.send(JSON.stringify({success:true, result:apps}));
+});	
+
+app.post('/create', function(request, response) {
+	var app_id  = request.body.app_id;
+	var options = request.body.options;
+
 	var conn = new sf.Connection({
   	instanceUrl : request.session.instance_url,
   	accessToken : request.session.access_token
 	});
 
+	if(app_id == "1234") {
+		create_contacts(request, response, conn);
+	}
+
+});
+
+var create_contacts = function(request, response, conn) {
 	conn.sobject("Contact")
   .find({ CreatedDate: sf.Date.YESTERDAY }, '*') // fields in asterisk, means wildcard.{ CreatedDate: sf.Date.TODAY },
   .execute(function(err, records) {
 
 		console.log(err);
-
 
 		var header = '<html>\n'
                + '<head>\n'
@@ -113,20 +147,21 @@ app.get('/contacts', function(request, response) {
 					exec(__dirname + '/create_contacts.sh ' + tempFolder, function(error, stdout, stderr) {
 						if(!!error) {
 							console.log(error);
-							response.send(JSON.stringify({success:false}));
+							response.send(JSON.stringify({success:false, message:error}));
 							return;
 						}
 
 						var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0].trim();
 						console.log(appUrl);
 
-						response.send(JSON.stringify({success:true, url: appUrl}));
+						response.send(JSON.stringify({success:true, result: appUrl}));
 					});	
 	  		});
 			});
 		});
   });
-});
+}
+
 
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
