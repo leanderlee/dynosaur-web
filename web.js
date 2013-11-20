@@ -1,6 +1,9 @@
 var express = require("express");
+var sf      = require("node-salesforce");
+var Heroku  = require("heroku-client");
+var fs      = require("fs");
+
 var app = express();
-var sf = require("node-salesforce");
 
 app.configure(function() {
   app.use(express.logger());
@@ -71,7 +74,28 @@ app.get('/contacts', function(request, response) {
 	conn.sobject("Contact")
   .find({ CreatedDate: sf.Date.TODAY }, '*') // fields in asterisk, means wildcard.
   .execute(function(err, records) {
-    response.send(JSON.stringify(records));
+
+
+		var header = '<html>\n'
+               + '<head>\n'
+							 + '<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />\n'
+							 + '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>\n'
+							 + '<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>\n'
+							 + '</head>\n'
+							 + '<body>\n';
+		var body = '<ul data-role="listview">\n';
+		for(var i = 0; i < Object.keys(records).length; i++) {
+			body += '<li><a href="#">' + records[i].Name + '</a></li>';
+		}
+
+		var footer = '</ul>\n'
+						   + '</body>\n'
+							 + '</html>\n'
+
+		var page = header + body + footer;
+		
+		response.send(page);
+	
   });
 });
 
