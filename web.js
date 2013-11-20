@@ -2,6 +2,7 @@ var express = require("express");
 var sf      = require("node-salesforce");
 var Heroku  = require("heroku-client");
 var fs      = require("fs");
+var exec = require("child_process").exec;
 
 var app = express();
 
@@ -72,8 +73,10 @@ app.get('/contacts', function(request, response) {
 	});
 
 	conn.sobject("Contact")
-  .find({ CreatedDate: sf.Date.TODAY }, '*') // fields in asterisk, means wildcard.
+  .find({ CreatedDate: sf.Date.YESTERDAY }, '*') // fields in asterisk, means wildcard.{ CreatedDate: sf.Date.TODAY },
   .execute(function(err, records) {
+
+		console.log(err);
 
 
 		var header = '<html>\n'
@@ -83,9 +86,10 @@ app.get('/contacts', function(request, response) {
 							 + '<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>\n'
 							 + '</head>\n'
 							 + '<body>\n';
+
 		var body = '<ul data-role="listview">\n';
 		for(var i = 0; i < Object.keys(records).length; i++) {
-			body += '<li><a href="#">' + records[i].Name + '</a></li>';
+			body += '<li><a href="#">' + records[i].Name + '</a></li>\n';
 		}
 
 		var footer = '</ul>\n'
@@ -93,8 +97,22 @@ app.get('/contacts', function(request, response) {
 							 + '</html>\n'
 
 		var page = header + body + footer;
-		
-		response.send(page);
+
+		fs.writeFile('repo/index.html', page, function(err) {
+			if(err) {
+				throw err;
+			}
+
+			console.log("Creating");
+			exec(__dirname + '/create.sh', function(error, stdout, stderr) {
+				console.log(stdout);
+				console.log(stderr);
+				if(!!error) {
+					console.log(error);
+				}
+			});	
+
+	  });
 	
   });
 });
