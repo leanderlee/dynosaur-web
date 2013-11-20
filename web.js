@@ -104,7 +104,7 @@ app.post('/create', function(request, response) {
 		create_contacts(request, response, conn);
 	}
 	else {
-		response.send({success:false, message:"Unknown app" + app_id});
+		response.send({success:false, message:"Unknown app: " + app_id});
 	}
 
 });
@@ -134,36 +134,41 @@ var create_contacts = function(request, response, conn) {
 							 + '</html>\n'
 
 		var page = header + body + footer;
+		create_app(page, request, response);
 
-		exec('uuidgen', function(error, stdout, stderr) {
+	 });
+}
 
-			var tempFolder = stdout.toString().trim();
-			console.log(tempFolder);
-			fs.mkdir(tempFolder, function(err) {
+var create_app = function(page, request, response) {
+	exec('uuidgen', function(error, stdout, stderr) {
 
-				fs.writeFile(tempFolder + '/index.html', page, function(err) {
-					if(err) {
-						throw err;
+		var tempFolder = stdout.toString().trim();
+		console.log(tempFolder);
+		fs.mkdir(tempFolder, function(err) {
+
+			fs.writeFile(tempFolder + '/index.html', page, function(err) {
+				if(err) {
+					throw err;
+				}
+
+				console.log("Creating");
+				exec(__dirname + '/create.sh ' + tempFolder, function(error, stdout, stderr) {
+					if(!!error) {
+						console.log(error);
+						response.send(JSON.stringify({success:false, message:error}));
+						return;
 					}
 
-					console.log("Creating");
-					exec(__dirname + '/create_contacts.sh ' + tempFolder, function(error, stdout, stderr) {
-						if(!!error) {
-							console.log(error);
-							response.send(JSON.stringify({success:false, message:error}));
-							return;
-						}
+					var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0].trim();
+					console.log(appUrl);
 
-						var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0].trim();
-						console.log(appUrl);
-
-						response.send(JSON.stringify({success:true, result: appUrl}));
-					});	
-	  		});
+					response.send(JSON.stringify({success:true, result: appUrl}));
+				});	
 			});
 		});
-  });
+	});
 }
+
 
 
 var port = process.env.PORT || 80;
