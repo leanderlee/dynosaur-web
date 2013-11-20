@@ -98,34 +98,34 @@ app.get('/contacts', function(request, response) {
 
 		var page = header + body + footer;
 
-		fs.writeFile('repo/index.html', page, function(err) {
-			if(err) {
-				throw err;
-			}
+		exec('uuidgen', function(error, stdout, stderr) {
 
-			console.log("Creating");
-			exec(__dirname + '/create.sh', function(error, stdout, stderr) {
-				if(!!error) {
-					console.log(error);
-					response.send(JSON.stringify({success:false}));
-					return;
-				}
+			var tempFolder = stdout.toString().trim();
+			console.log(tempFolder);
+			fs.mkdir(tempFolder, function(err) {
 
-				var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0];
-				console.log(appUrl);
+				fs.writeFile(tempFolder + '/index.html', page, function(err) {
+					if(err) {
+						throw err;
+					}
 
-				response.send(JSON.stringify({success:true, url: appUrl}));
-			});	
+					console.log("Creating");
+					exec(__dirname + '/create_contacts.sh ' + tempFolder, function(error, stdout, stderr) {
+						if(!!error) {
+							console.log(error);
+							response.send(JSON.stringify({success:false}));
+							return;
+						}
 
-	  });
-	
+						var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0].trim();
+						console.log(appUrl);
+
+						response.send(JSON.stringify({success:true, url: appUrl}));
+					});	
+	  		});
+			});
+		});
   });
-});
-
-app.post('/filter', function(request, response) {
-  var type = request.body.type;
-
-  var peopleList = JSON.parse(request.body.peopleList);
 });
 
 var port = process.env.PORT || 5000;

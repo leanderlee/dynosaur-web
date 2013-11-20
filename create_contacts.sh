@@ -1,7 +1,6 @@
 #!/bin/bash
-DIR=$(uuidgen)
+DIR=$1
 
-mkdir $DIR
 cd $DIR
 cp ../contacts/* ./
 git init > /dev/null
