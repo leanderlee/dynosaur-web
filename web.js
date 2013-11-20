@@ -55,7 +55,7 @@ app.post('/login', function(request, response) {
 	do {
 		var sid = randstr(20);
 	} while (sessions[sid])
-	var session = {};
+	sessions[sid] = {};
 
 	var conn = new sf.Connection({
 		oauth2 : {
@@ -71,13 +71,12 @@ app.post('/login', function(request, response) {
 			console.error(err);
 		}
 
-		session.access_token = conn.accessToken;
-		session.instance_url = conn.instanceUrl;
+		sessions[sid].access_token = conn.accessToken;
+		sessions[sid].instance_url = conn.instanceUrl;
 
-		console.log(session.access_token);
-
-  	console.log("User ID: " + userInfo.id);
-  	console.log("Org ID: " + userInfo.organizationId);
+		console.log("Access Token: %s.", session.access_token);
+	  	console.log("User ID: %s.", userInfo.id);
+  		console.log("Org ID: %s.", userInfo.organizationId);
 	
 		response.send(JSON.stringify({success:true, session: sid, result:userInfo}));
 	});
