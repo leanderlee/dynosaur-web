@@ -105,11 +105,16 @@ app.get('/contacts', function(request, response) {
 
 			console.log("Creating");
 			exec(__dirname + '/create.sh', function(error, stdout, stderr) {
-				console.log(stdout);
-				console.log(stderr);
 				if(!!error) {
 					console.log(error);
+					response.send(JSON.stringify({success:false}));
+					return;
 				}
+
+				var appUrl = ((stdout.toString().split('\n'))[1]).split('|')[0];
+				console.log(appUrl);
+
+				response.send(JSON.stringify({success:true, url: appUrl}));
 			});	
 
 	  });
