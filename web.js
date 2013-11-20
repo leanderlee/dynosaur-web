@@ -103,6 +103,9 @@ app.post('/create', function(request, response) {
 	if(app_id == "1234") {
 		create_contacts(request, response, conn);
 	}
+	else {
+		response.send({success:false, message:"Unknown app" + app_id});
+	}
 
 });
 
