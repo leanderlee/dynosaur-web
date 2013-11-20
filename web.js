@@ -14,6 +14,14 @@ app.configure(function() {
        secret: "some string here"
 	}));
 });
+app.use(function(req, res, next) {
+	var allowHeaders = ['Cache-Control', 'Pragma', 'Accept', 'Accept-Version', 'Authorization', 'Content-Type', 'Api-Version', 'Origin', 'Referer', 'User-Agent', 'X-Requested-With', 'X-File-Name'];
+	res.header('Access-Control-Allow-Credentials', true);
+	res.header('Access-Control-Allow-Origin', req.headers['origin'] || "*");
+	res.header('Access-Control-Allow-Headers', req.headers['access-control-request-headers'] || allowHeaders.join(','));
+	res.header('Access-Control-Allow-Methods', req.headers['access-control-request-method'] || ["GET", "PUT", "DELETE", "POST", "OPTIONS"].join(','));
+	next();
+});
 
 app.get('/', function(request, response) {
   response.send(JSON.stringify('Dynosaur API is running'));
