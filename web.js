@@ -85,7 +85,7 @@ app.post('/login', function(request, response) {
 });
 
 app.get('/logged_in', function(request, response) {
-	var sid = request.body.session;
+	var sid = request.query.session;
 	var session = sessions[sid || ""] || {};
 	response.send(JSON.stringify(!!session.access_token));
 });
