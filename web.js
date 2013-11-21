@@ -178,7 +178,7 @@ var create_contacts = function(request, response, conn) {
 							 + '</head>\n'
 							 + '<body>\n'
 							 + '<header data-role = "header" data-backbtn="false">\n'
-    					 + '<h1>Coupons</h1>\n'
+    					 + '<h1>Contacts</h1>\n'
   						 + '</header>\n';
 
 
