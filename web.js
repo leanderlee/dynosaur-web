@@ -215,7 +215,7 @@ var create_coupons = function(request, response, conn) {
 		var body = '<ul data-role="listview">\n';
 		for(var i = 0; i < Object.keys(result.records).length; i++) {
 			var record = result.records[i];
-			body += '<li><img src="http://i.imgur.com/qr90o4q.png" /><a href="#"><h1>' + record.description__c + record.validdate__c +'</h1></a></li>\n';
+			body += '<li><img src="http://i.imgur.com/8996zpE.png" /><a href="#"><h1>' + record.description__c + record.validdate__c +'</h1></a></li>\n';
 		}
 
 		var footer = '</ul>\n'
