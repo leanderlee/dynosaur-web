@@ -150,7 +150,11 @@ var create_contacts = function(request, response, conn) {
 							 + '<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>\n'
 							 + '<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>\n'
 							 + '</head>\n'
-							 + '<body>\n';
+							 + '<body>\n'
+							 + '<header data-role = "header" data-backbtn="false">\n'
+    					 + '<h1>Coupons</h1>\n'
+  						 + '</header>\n';
+
 
 		var body = '<ul data-role="listview">\n';
 		for(var i = 0; i < Object.keys(records).length; i++) {
@@ -178,6 +182,9 @@ var create_coupons = function(request, response, conn) {
 							 + '<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>\n'
 							 + '</head>\n'
 							 + '<body>\n';
+							 + '<header data-role = "header" data-backbtn="false">\n'
+    					 + '<h1>Coupons</h1>\n'
+  						 + '</header>\n';
 
 		var body = '<ul data-role="listview">\n';
 		for(var i = 0; i < Object.keys(result.records).length; i++) {
