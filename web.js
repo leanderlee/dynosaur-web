@@ -93,22 +93,48 @@ app.get('/apps', function(request, response) {
 	var apps = [
 		{
 			id: "1234",
-			name: "Awesome App 1",
-			description: "This is a description of app 1.",
-			thumbnail: "http://dynosapp.com/thumbnail1.png",
-			picture: "http://dynosapp.com/picture1.png",
+			name: "Contacts List",
+			description: "Quickly view the list of contacts on Salesforce.com. This is a demonstration of the features of a dynosaur custom web app.",
+			options: []
+		},
+		{
+			id: "1235",
+			name: "Coupons",
+			description: "Generate a web app to engage customers with coupons already in your Salesforce account.",
+			options: []
+		},
+		{
+			id: "1236",
+			name: "Sales App",
+			description: "New businesses with existing products in Salesforce can automatically take orders in the field.",
+			options: []
+		},
+		{
+			id: "1237",
+			name: "Map Locations",
+			description: "Easily map all locations from Salesforce into a web app.",
+			options: [{ property: "area", label: "Near Region", type: "text", "default": "" }]
+		},
+		{
+			id: "1238",
+			name: "RSVP List",
+			description: "Coordinate with Salesforce contacts by allowing them to mark their availablity.",
+			options: []
+		},
+		{
+			id: "1239",
+			name: "Inventory",
+			description: "Allow customers and clients to keep track of product inventory on Salesforce. Optionally add secure authentication for clients.",
 			options: [
-				{ property: "name", label: "Name", type: "text", "default": "unnamed app" },
-				{ property: "gender", label: "Sex", type: "select", options: [{ value: "m", label: "Male" }, { value: "f", label: "Female" }] },
+				{ property: "security", label: "Security Type", type: "select", "default": "",
+				options: [
+					{ label: "None", value: "" },
+					{ label: "User Sign On", value: "username" },
+					{ label: "Salesforce User", value: "salesforce" },
+					{ label: "Passcode", value: "passcode" },
+				]}
 			]
 		},
-		{ id: "1235", name: "Awesome App 2", description: "This is a description of app 2.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1236", name: "Awesome App 3", description: "This is a description of app 3.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1237", name: "Awesome App 4", description: "This is a description of app 4.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1238", name: "Awesome App 5", description: "This is a description of app 5.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1239", name: "Awesome App 6", description: "This is a description of app 6.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1230", name: "Awesome App 7", description: "This is a description of app 7.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] },
-		{ id: "1231", name: "Awesome App 8", description: "This is a description of app 8.", options: [{ property: "name", label: "Name", type: "text", "default": "unnamed app" }] }
 	];
 
 	response.send(JSON.stringify({success:true, result:apps}));
