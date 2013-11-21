@@ -7,7 +7,7 @@ app.use(express.logger());
 app.engine('html', cons.swig);
 app.set('view engine', 'html');
 app.set('views', __dirname);
-app.use(express.static(__dirname + "/images"));
+app.use('/images', express.static(__dirname + "/images"));
 
 app.get('/', function(request, response) {
 		response.render('index.html', {
