@@ -165,7 +165,7 @@ app.post('/create', function(request, response) {
 
 var create_contacts = function(request, response, conn) {
 	conn.sobject("Contact")
-  .find({ CreatedDate: sf.Date.YESTERDAY }, '*') // fields in asterisk, means wildcard.{ CreatedDate: sf.Date.TODAY },
+  .find({ CreatedDate: { $lte:sf.Date.YESTERDAY } }, '*') // fields in asterisk, means wildcard.{ CreatedDate: sf.Date.TODAY },
   .execute(function(err, records) {
 
 		console.log(err);
